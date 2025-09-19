@@ -15,6 +15,13 @@ public:
 	
 	void CleanPlayer();
 
+	Supernova::Vector2 GetPosition() const { return position; }
+	Supernova::Vector2 GetSize() const { return size; }
+
+	int GetPlayerScore() const { return playerScore; }
+
+	void IncrementScore(int newValue_);
+
 private:
 	void DetectPlayerInput();
 
@@ -22,6 +29,8 @@ private:
 	static constexpr float playerMoveSpeed = 350.0f;
 
 	Supernova::Image playerImage;
+
+	int playerScore;
 };
 
 #endif PLAYER_H

@@ -3,6 +3,7 @@
 
 #include "Player.h"
 #include "Egg.h"
+#include "Chicken.h"
 
 class Game
 {
@@ -16,16 +17,24 @@ public:
 	void CleanGame();
 
 private:
-	void SpawnEggs();
+	void UpdateChickens();
 	void IterateThroughEggs();
+
+	void SpawnChickens();
 
 private:
 	Supernova::Scene scene;
+	Supernova::Scene UI_scene;
+
+	Supernova::Text playerScoreText;
 
 	Player player;
+
+	std::vector<Chicken*> chickens;
 	std::vector<Egg*> eggs;
 
-	float spawnEggTime;
+	float spawnChickenTime;
+	float randomMaxTime;
 };
 
 #endif GAME_H

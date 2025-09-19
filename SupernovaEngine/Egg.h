@@ -12,14 +12,15 @@ public:
 	virtual void InitializeGameObject() override;
 	virtual void UpdateGameObject() override;
 
-	float GetPositionY() const { return position.y; }
+	Supernova::Vector2 GetPosition() const { return position; }
+	Supernova::Vector2 GetSize() const { return size; }
 
 	bool CheckEggCollision(Supernova::Vector2 otherPos_, Supernova::Vector2 otherSize_);
 
 private:
 	Supernova::Image egg;
 
-	static constexpr float fallSpeed = 200.0f;
+	static constexpr float fallSpeed = 500.0f;
 };
 
 #endif EGG_H

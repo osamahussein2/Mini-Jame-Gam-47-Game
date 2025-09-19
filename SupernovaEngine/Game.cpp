@@ -1,7 +1,9 @@
 #include "Game.h"
 
-Game::Game() : player(&scene), spawnEggTime(0.0f)
+Game::Game() : player(&scene), spawnChickenTime(0.0f), randomMaxTime(0.0f), playerScoreText(&UI_scene)
 {
+    randomMaxTime = 1.0f + (rand() % 2);
+    playerScoreText.setVisible(false);
 }
 
 Game::~Game()
@@ -13,10 +15,19 @@ void Game::InitializeGame()
     // Initialize player
     player.InitializeGameObject();
 
+    playerScoreText.setAnchorPreset(Supernova::AnchorPreset::TOP_LEFT);
+    playerScoreText.setPositionXOffset(20.0f);
+    playerScoreText.setPositionYOffset(20.0f);
+    playerScoreText.setText("Score: " + std::to_string(player.GetPlayerScore()));
+    playerScoreText.setColor(1.0f, 1.0f, 1.0f);
+    playerScoreText.setFontSize(25.0f);
+    playerScoreText.setVisible(true);
+
     // Initialize engine members
     Supernova::Engine::setScalingMode(Supernova::Scaling::STRETCH);
     Supernova::Engine::setCanvasSize(1000, 600);
     Supernova::Engine::setScene(&scene);
+    Supernova::Engine::addSceneLayer(&UI_scene);
     Supernova::Engine::setAutomaticTransparency(false);
 }
 
@@ -25,13 +36,26 @@ void Game::UpdateGame()
     // Update player
     player.UpdateGameObject();
 
+    // Update player's score
+    if (playerScoreText.getText() != "Score: " + std::to_string(player.GetPlayerScore()))
+    {
+        playerScoreText.setText("Score: " + std::to_string(player.GetPlayerScore()));
+    }
+
+    // Update chickens vector
+    SpawnChickens();
+    UpdateChickens();
+
     // Update eggs vector
-    SpawnEggs();
     IterateThroughEggs();
 }
 
 void Game::CleanGame() // Executes after the program quits running
 {
+    // Destroy scenes
+    scene.destroy();
+    UI_scene.destroy();
+
     // Clean the player (if needed)
     player.CleanPlayer();
 
@@ -41,20 +65,52 @@ void Game::CleanGame() // Executes after the program quits running
         delete egg;
     }
 
-    // Clear all the eggs off the vector
+    // Release all memory that the chicken elements have used up
+    for (Chicken* chicken : chickens)
+    {
+        delete chicken;
+    }
+
+    // Clear all elements of the vector
     if (!eggs.empty()) eggs.clear();
+    if (!chickens.empty()) chickens.clear();
 }
 
-void Game::SpawnEggs()
+void Game::UpdateChickens()
 {
-    // Increment time to spawn eggs
-    spawnEggTime += 0.016f;
-
-    // If spawn egg time exceeds some value, spawn the eggs and reset the time back to 0
-    if (spawnEggTime >= 3.0f)
+    for (Chicken* chicken : chickens)
     {
-        eggs.push_back(new Egg(&scene, Supernova::Vector2(50.0f, 0.0f)));
-        spawnEggTime = 0.0f;
+        // If the chicken stops moving and hasn't spawned an egg, spawn an egg
+        if (chicken->GetStoppedMoving() && !chicken->GetSpawnedEgg())
+        {
+            eggs.push_back(new Egg(&scene, Supernova::Vector2(chicken->GetPosition().x, chicken->GetPosition().y)));
+
+            // This just sets spawned egg for the chicken to true and re-enables their movement
+            chicken->SpawnedEgg();
+        }
+    }
+
+    // Iterate through all the chickens in the element
+    for (std::vector<Chicken*>::iterator chickenIt = chickens.begin(); chickenIt != chickens.end();)
+    {
+        Chicken* chicken = *chickenIt;
+
+        // Update chickens
+        chicken->UpdateGameObject();
+
+        /* If the chicken goes offscreen based on their random direction value, erase it from the vector and delete the
+        pointer element from memory */
+        if (chicken->GetPosition().x >= 1010.0f && chicken->GetRandomDirection() == 0 ||
+            chicken->GetPosition().x <= -110.0f && chicken->GetRandomDirection() == 1)
+        {
+            delete chicken;
+            chickenIt = chickens.erase(chickenIt);
+        }
+
+        else // Otherwise, just keep looping through the egg elements
+        {
+            ++chickenIt;
+        }
     }
 }
 
@@ -69,8 +125,21 @@ void Game::IterateThroughEggs()
         egg->UpdateGameObject();
 
         // If the egg goes below the screen, erase it from the vector and delete the pointer element from memory
-        if (egg->GetPositionY() >= 610.0f)
+        if (egg->GetPosition().y >= 610.0f)
         {
+            delete egg;
+            eggIt = eggs.erase(eggIt);
+        }
+
+        // If the egg collides with the player, also erase it from the vector and delete the pointer element from memory
+        else if (egg->CheckEggCollision(player.GetPosition(), player.GetSize()))
+        {
+            // Only increment the score if the egg is on top of the basket upon collision
+            if (egg->GetPosition().y + (egg->GetSize().y / 1.2f) <= player.GetPosition().y)
+            {
+                player.IncrementScore(10);
+            }
+
             delete egg;
             eggIt = eggs.erase(eggIt);
         }
@@ -79,5 +148,21 @@ void Game::IterateThroughEggs()
         {
             ++eggIt;
         }
+    }
+}
+
+void Game::SpawnChickens()
+{
+    // Increment time to spawn chickens
+    spawnChickenTime += 0.016f;
+
+    // If spawn chicken time exceeds some value, spawn the chicken
+    if (spawnChickenTime >= randomMaxTime)
+    {
+        chickens.push_back(new Chicken(&scene, 0.0f));
+
+        // Also randomize the max timer again to spawn more chickens and reset the time back to 0
+        randomMaxTime = 1.0f + (rand() % 2);
+        spawnChickenTime = 0.0f;
     }
 }
