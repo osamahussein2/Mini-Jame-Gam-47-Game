@@ -14,6 +14,14 @@ public:
 	virtual void UpdateGameObject() override;
 	
 	void CleanPlayer();
+
+private:
+	void DetectPlayerInput();
+
+private:
+	static constexpr float playerMoveSpeed = 350.0f;
+
+	Supernova::Image playerImage;
 };
 
 #endif PLAYER_H

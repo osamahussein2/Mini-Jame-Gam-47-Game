@@ -7,11 +7,14 @@
 class GameObject
 {
 protected:
-	GameObject() {}
+	GameObject() : position(), size() {}
 	virtual ~GameObject() {}
 
 	virtual void InitializeGameObject() = 0;
 	virtual void UpdateGameObject() = 0;
+	
+	Supernova::Vector2 position;
+	Supernova::Vector2 size;
 };
 
 #endif GAMEOBJECT_H
