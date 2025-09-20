@@ -5,23 +5,21 @@ Egg::Egg(Supernova::Scene* scene_, Supernova::Vector2& spawnPos_, EggType eggTyp
 	eggType = eggType_;
 
 	position = spawnPos_;
-	size = Supernova::Vector2(100.0f, 100.0f);
+	size = Supernova::Vector2(50.0f, 50.0f);
 
-	// Set egg image settings
-	egg.setTexture("");
-
-	// Set egg's color based on type of egg
+	// Set egg's texture based on type of egg
 	switch (eggType)
 	{
 	case EggType::FreshEgg:
-		egg.setColor(1.0f, 1.0f, 1.0f);
+		egg.setTexture("FreshEgg.png");
 		break;
 
 	case EggType::FakeEgg:
-		egg.setColor(0.3f, 0.3f, 0.3f);
+		egg.setTexture("FakeEgg.png");
 		break;
 	}
 
+	// Set egg image settings
 	egg.setSize(size.x, size.y);
 	egg.setPosition(position.x, position.y);
 	egg.setVisible(true);
