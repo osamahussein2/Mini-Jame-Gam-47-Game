@@ -21,6 +21,8 @@ public:
 
 	Supernova::Vector2 GetPosition() const { return position; }
 
+	int GetRandomizedPercentage() const { return randomizedPercentage; }
+
 private:
 	static constexpr float chickenMoveSpeed = 300.0f;
 
@@ -36,6 +38,8 @@ private:
 
 	bool knowsStopPoint;
 	bool stoppedMoving;
+
+	int randomizedPercentage;
 };
 
 #endif CHICKEN_H

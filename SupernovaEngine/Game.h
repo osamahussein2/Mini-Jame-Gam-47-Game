@@ -25,11 +25,13 @@ private:
 
 	void HandleGameInput();
 
+	void ResetGame();
+
 private:
 	Supernova::Scene scene;
 	Supernova::Scene UI_scene;
 
-	Supernova::Text playerScoreText;
+	Supernova::Text playerScoreText, playerLivesText;
 
 	Player player;
 

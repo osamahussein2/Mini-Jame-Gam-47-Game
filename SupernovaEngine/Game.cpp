@@ -1,7 +1,7 @@
 #include "Game.h"
 
 Game::Game() : player(&scene), spawnChickenTime(0.0f), randomMaxTime(0.0f), playerScoreText(&UI_scene), gamePaused(false),
-pauseMenu(&UI_scene), pauseKeyPressed(false)
+pauseMenu(&UI_scene), pauseKeyPressed(false), playerLivesText(&UI_scene)
 {
     randomMaxTime = 1.0f + (rand() % 2);
     playerScoreText.setVisible(false);
@@ -23,6 +23,14 @@ void Game::InitializeGame()
     playerScoreText.setColor(1.0f, 1.0f, 1.0f);
     playerScoreText.setFontSize(25.0f);
     playerScoreText.setVisible(true);
+
+    playerLivesText.setAnchorPreset(Supernova::AnchorPreset::TOP_LEFT);
+    playerLivesText.setPositionXOffset(20.0f);
+    playerLivesText.setPositionYOffset(50.0f);
+    playerLivesText.setText("Lives: " + std::to_string(player.GetPlayerLives()));
+    playerLivesText.setColor(1.0f, 1.0f, 1.0f);
+    playerLivesText.setFontSize(25.0f);
+    playerLivesText.setVisible(true);
 
     pauseMenu.InitializePauseMenu();
 
@@ -48,12 +56,20 @@ void Game::UpdateGame()
             playerScoreText.setText("Score: " + std::to_string(player.GetPlayerScore()));
         }
 
+        // Update player's life value
+        if (playerLivesText.getText() != "Lives: " + std::to_string(player.GetPlayerLives()))
+        {
+            playerLivesText.setText("Lives: " + std::to_string(player.GetPlayerLives()));
+        }
+
         // Update chickens vector
         SpawnChickens();
         UpdateChickens();
 
         // Update eggs vector
         IterateThroughEggs();
+
+        if (player.GetPlayerLives() <= 0) ResetGame();
     }
 
     // Otherwise, when the game IS paused
@@ -107,10 +123,27 @@ void Game::UpdateChickens()
         // If the chicken stops moving and hasn't spawned an egg, spawn an egg
         if (chicken->GetStoppedMoving() && !chicken->GetSpawnedEgg())
         {
-            eggs.push_back(new Egg(&scene, Supernova::Vector2(chicken->GetPosition().x, chicken->GetPosition().y)));
+            // If the percentage is between 0-60
+            if (chicken->GetRandomizedPercentage() <= 60)
+            {
+                // Spawn a fresh egg
+                eggs.push_back(new Egg(&scene, Supernova::Vector2(chicken->GetPosition().x, chicken->GetPosition().y), 
+                    EggType::FreshEgg));
 
-            // This just sets spawned egg for the chicken to true and re-enables their movement
-            chicken->SpawnedEgg();
+                // This just sets spawned egg for the chicken to true and re-enables their movement
+                chicken->SpawnedEgg();
+            }
+
+            // Otherwise, the percentage is greater than 60 (this half is meant for 40% chance)
+            else
+            {
+                // Spawn a fake egg
+                eggs.push_back(new Egg(&scene, Supernova::Vector2(chicken->GetPosition().x, chicken->GetPosition().y),
+                    EggType::FakeEgg));
+
+                // This just sets spawned egg for the chicken to true and re-enables their movement
+                chicken->SpawnedEgg();
+            }
         }
     }
 
@@ -158,10 +191,18 @@ void Game::IterateThroughEggs()
         // If the egg collides with the player, also erase it from the vector and delete the pointer element from memory
         else if (egg->CheckEggCollision(player.GetPosition(), player.GetSize()))
         {
-            // Only increment the score if the egg is on top of the basket upon collision
-            if (egg->GetPosition().y + (egg->GetSize().y / 1.2f) <= player.GetPosition().y)
+            // Only increment the score if the fresh egg is on top of the basket upon collision
+            if (egg->GetPosition().y + (egg->GetSize().y / 1.2f) <= player.GetPosition().y && 
+                egg->GetEggType() == EggType::FreshEgg)
             {
                 player.IncrementScore(10);
+            }
+
+            // Only decrement player's life if the fake egg is on top of the basket upon collision
+            else if (egg->GetPosition().y + (egg->GetSize().y / 1.2f) <= player.GetPosition().y &&
+                egg->GetEggType() == EggType::FakeEgg)
+            {
+                player.DecrementLife(1);
             }
 
             delete egg;
@@ -215,4 +256,28 @@ void Game::HandleGameInput()
     {
         pauseKeyPressed = false;
     }
+}
+
+void Game::ResetGame()
+{
+    // Reset the entire game back to starting values
+    player.ResetStats();
+
+    spawnChickenTime = 0.0f;
+
+    // Release all memory that the egg elements have used up
+    for (Egg* egg : eggs)
+    {
+        delete egg;
+    }
+
+    // Release all memory that the chicken elements have used up
+    for (Chicken* chicken : chickens)
+    {
+        delete chicken;
+    }
+
+    // Clear all elements of the vector
+    if (!eggs.empty()) eggs.clear();
+    if (!chickens.empty()) chickens.clear();
 }

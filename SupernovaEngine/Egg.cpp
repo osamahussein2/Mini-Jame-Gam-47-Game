@@ -1,12 +1,27 @@
 #include "Egg.h"
 
-Egg::Egg(Supernova::Scene* scene_, Supernova::Vector2& spawnPos_) : GameObject(), egg(scene_)
+Egg::Egg(Supernova::Scene* scene_, Supernova::Vector2& spawnPos_, EggType eggType_) : GameObject(), egg(scene_)
 {
+	eggType = eggType_;
+
 	position = spawnPos_;
 	size = Supernova::Vector2(100.0f, 100.0f);
 
 	// Set egg image settings
 	egg.setTexture("");
+
+	// Set egg's color based on type of egg
+	switch (eggType)
+	{
+	case EggType::FreshEgg:
+		egg.setColor(1.0f, 1.0f, 1.0f);
+		break;
+
+	case EggType::FakeEgg:
+		egg.setColor(0.3f, 0.3f, 0.3f);
+		break;
+	}
+
 	egg.setSize(size.x, size.y);
 	egg.setPosition(position.x, position.y);
 	egg.setVisible(true);

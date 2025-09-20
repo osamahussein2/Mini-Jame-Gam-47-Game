@@ -19,18 +19,23 @@ public:
 	Supernova::Vector2 GetSize() const { return size; }
 
 	int GetPlayerScore() const { return playerScore; }
+	int GetPlayerLives() const { return playerLives; }
 
 	void IncrementScore(int newValue_);
+	void DecrementLife(int newValue_);
+
+	void ResetStats();
 
 private:
 	void DetectPlayerInput();
 
 private:
-	static constexpr float playerMoveSpeed = 350.0f;
+	static constexpr float playerMoveSpeed = 700.0f;
 
 	Supernova::Image playerImage;
 
 	int playerScore;
+	int playerLives;
 };
 
 #endif PLAYER_H

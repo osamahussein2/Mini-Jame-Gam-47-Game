@@ -1,7 +1,7 @@
 #include "Chicken.h"
 
 Chicken::Chicken(Supernova::Scene* scene_, float posY_) : chickenImage(scene_),  spawnedEgg(false), stopPoint(0.0f),
-knowsStopPoint(false), stoppedMoving(false), randomizeDirection(0)
+knowsStopPoint(false), stoppedMoving(false), randomizeDirection(0), randomizedPercentage(0)
 {
 	randomizeDirection = rand() % 2;
 
@@ -57,6 +57,7 @@ void Chicken::UpdateGameObject()
 			if (position.x < stopPoint && !stoppedMoving)
 			{
 				position.x += chickenMoveSpeed * 0.016f;
+				randomizedPercentage = rand() % 100; // Also randomize the percentage of a certain egg spawning
 			}
 
 			// Check if the chicken reached the stop point to stop moving until they spawned an egg
