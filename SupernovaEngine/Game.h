@@ -30,6 +30,8 @@ private:
 
 	void ExecuteGameOverScreen();
 
+	void StopGameMusic();
+
 private:
 	Supernova::Scene scene;
 	Supernova::Scene UI_scene;
@@ -44,6 +46,8 @@ private:
 	PauseMenu pauseMenu;
 	GameOver gameOver;
 
+	Supernova::Audio gameMusic;
+
 	float spawnChickenTime;
 	float randomMaxTime;
 
@@ -51,6 +55,8 @@ private:
 	bool pauseKeyPressed;
 
 	bool isGameOver;
+
+	bool musicPlaying;
 };
 
 #endif GAME_H

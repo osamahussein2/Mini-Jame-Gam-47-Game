@@ -1,7 +1,8 @@
 #include "Game.h"
 
 Game::Game() : player(&scene), spawnChickenTime(0.0f), randomMaxTime(0.0f), playerScoreText(&UI_scene), gamePaused(false),
-pauseMenu(&UI_scene), pauseKeyPressed(false), playerLivesText(&UI_scene), gameOver(&UI_scene), isGameOver(false)
+pauseMenu(&UI_scene), pauseKeyPressed(false), playerLivesText(&UI_scene), gameOver(&UI_scene), isGameOver(false), 
+gameMusic(&scene), musicPlaying(false)
 {
     randomMaxTime = 1.0f + (rand() % 2);
     playerScoreText.setVisible(false);
@@ -35,6 +36,11 @@ void Game::InitializeGame()
     pauseMenu.InitializePauseMenu();
     gameOver.InitializeGameOver(player);
 
+    // Initialize game music
+    gameMusic.loadAudio("EggBasketGame DRAFT.mp3");
+    gameMusic.setSound3D(false);
+    gameMusic.setLopping(true);
+
     // Initialize engine members
     Supernova::Engine::setScalingMode(Supernova::Scaling::STRETCH);
     Supernova::Engine::setCanvasSize(1000, 600);
@@ -50,6 +56,13 @@ void Game::UpdateGame()
     {
         if (player.GetPlayerLives() > 0)
         {
+            // Play game music
+            if (!musicPlaying)
+            {
+                gameMusic.play();
+                musicPlaying = true;
+            }
+
             // Update player
             player.UpdateGameObject();
 
@@ -107,6 +120,11 @@ void Game::CleanGame() // Executes after the program quits running
     // Destroy scenes
     scene.destroy();
     UI_scene.destroy();
+
+    // Music will be destroyed anyways
+    musicPlaying = false;
+
+    gameMusic.destroyAudio();
 
     // Clean the player (if needed)
     player.CleanPlayer();
@@ -286,6 +304,8 @@ void Game::ExecuteGameOverScreen()
         // Hide the pause menu if it isn't hidden already
         if (pauseMenu.GetVisibilty()) pauseMenu.ResumeGame();
 
+        StopGameMusic();
+
         // Update player's life value
         playerLivesText.setText("Lives: " + std::to_string(player.GetPlayerLives()));
 
@@ -328,5 +348,15 @@ void Game::ExecuteGameOverScreen()
             ResetGame();
             isGameOver = false;
         }
+    }
+}
+
+void Game::StopGameMusic()
+{
+    // Stop playing music
+    if (musicPlaying)
+    {
+        gameMusic.stop();
+        musicPlaying = false;
     }
 }
