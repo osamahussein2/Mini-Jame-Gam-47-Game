@@ -4,6 +4,7 @@
 #include "Player.h"
 #include "Egg.h"
 #include "Chicken.h"
+#include "PauseMenu.h"
 
 class Game
 {
@@ -22,6 +23,8 @@ private:
 
 	void SpawnChickens();
 
+	void HandleGameInput();
+
 private:
 	Supernova::Scene scene;
 	Supernova::Scene UI_scene;
@@ -32,9 +35,14 @@ private:
 
 	std::vector<Chicken*> chickens;
 	std::vector<Egg*> eggs;
+	
+	PauseMenu pauseMenu;
 
 	float spawnChickenTime;
 	float randomMaxTime;
+
+	bool gamePaused;
+	bool pauseKeyPressed;
 };
 
 #endif GAME_H

@@ -1,6 +1,7 @@
 #include "Game.h"
 
-Game::Game() : player(&scene), spawnChickenTime(0.0f), randomMaxTime(0.0f), playerScoreText(&UI_scene)
+Game::Game() : player(&scene), spawnChickenTime(0.0f), randomMaxTime(0.0f), playerScoreText(&UI_scene), gamePaused(false),
+pauseMenu(&UI_scene), pauseKeyPressed(false)
 {
     randomMaxTime = 1.0f + (rand() % 2);
     playerScoreText.setVisible(false);
@@ -23,6 +24,8 @@ void Game::InitializeGame()
     playerScoreText.setFontSize(25.0f);
     playerScoreText.setVisible(true);
 
+    pauseMenu.InitializePauseMenu();
+
     // Initialize engine members
     Supernova::Engine::setScalingMode(Supernova::Scaling::STRETCH);
     Supernova::Engine::setCanvasSize(1000, 600);
@@ -33,21 +36,42 @@ void Game::InitializeGame()
 
 void Game::UpdateGame()
 {
-    // Update player
-    player.UpdateGameObject();
-
-    // Update player's score
-    if (playerScoreText.getText() != "Score: " + std::to_string(player.GetPlayerScore()))
+    // When the game is NOT paused
+    if (!gamePaused)
     {
-        playerScoreText.setText("Score: " + std::to_string(player.GetPlayerScore()));
+        // Update player
+        player.UpdateGameObject();
+
+        // Update player's score
+        if (playerScoreText.getText() != "Score: " + std::to_string(player.GetPlayerScore()))
+        {
+            playerScoreText.setText("Score: " + std::to_string(player.GetPlayerScore()));
+        }
+
+        // Update chickens vector
+        SpawnChickens();
+        UpdateChickens();
+
+        // Update eggs vector
+        IterateThroughEggs();
     }
 
-    // Update chickens vector
-    SpawnChickens();
-    UpdateChickens();
+    // Otherwise, when the game IS paused
+    else
+    {
+        // Update pause menu
+        pauseMenu.UpdatePauseMenu();
+    }
 
-    // Update eggs vector
-    IterateThroughEggs();
+    // Set game paused to false whenever pause menu isn't visible
+    if (!pauseMenu.GetVisibilty() && gamePaused)
+    {
+        pauseMenu.ResetSelectedOption();
+        gamePaused = false;
+    }
+
+    // Check for game related input
+    HandleGameInput();
 }
 
 void Game::CleanGame() // Executes after the program quits running
@@ -164,5 +188,31 @@ void Game::SpawnChickens()
         // Also randomize the max timer again to spawn more chickens and reset the time back to 0
         randomMaxTime = 1.0f + (rand() % 2);
         spawnChickenTime = 0.0f;
+    }
+}
+
+void Game::HandleGameInput()
+{
+    // Pause the game
+    if (Supernova::Input::isKeyPressed(S_KEY_ESCAPE) && !gamePaused && !pauseKeyPressed)
+    {
+        pauseMenu.PauseGame();
+        gamePaused = true;
+
+        pauseKeyPressed = true;
+    }
+
+    // Resume game
+    if (Supernova::Input::isKeyPressed(S_KEY_ESCAPE) && gamePaused && !pauseKeyPressed)
+    {
+        pauseMenu.ResumeGame();
+
+        pauseKeyPressed = true;
+    }
+
+    // Set bool back to false to be able to press ESCAPE again
+    else if (!Supernova::Input::isKeyPressed(S_KEY_ESCAPE) && pauseKeyPressed)
+    {
+        pauseKeyPressed = false;
     }
 }
