@@ -20,9 +20,12 @@ public:
 
 	int GetPlayerScore() const { return playerScore; }
 	int GetPlayerLives() const { return playerLives; }
+	int GetPlayerHighscore() const { return playerHighScore; }
 
 	void IncrementScore(int newValue_);
 	void DecrementLife(int newValue_);
+
+	void UpdateHighscore();
 
 	void ResetStats();
 
@@ -36,6 +39,8 @@ private:
 
 	int playerScore;
 	int playerLives;
+
+	int playerHighScore;
 };
 
 #endif PLAYER_H

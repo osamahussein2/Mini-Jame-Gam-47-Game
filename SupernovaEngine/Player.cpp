@@ -1,6 +1,7 @@
 #include "Player.h"
 
-Player::Player(Supernova::Scene* scene_) : GameObject(), playerImage(scene_), playerScore(0), playerLives(5)
+Player::Player(Supernova::Scene* scene_) : GameObject(), playerImage(scene_), playerScore(0), playerLives(5), 
+playerHighScore(0)
 {
 	position = Supernova::Vector2(300.0f, 550.0f);
 	size = Supernova::Vector2(100.0f, 100.0f);
@@ -35,6 +36,11 @@ void Player::IncrementScore(int newValue_)
 void Player::DecrementLife(int newValue_)
 {
 	playerLives -= newValue_;
+}
+
+void Player::UpdateHighscore()
+{
+	if (playerHighScore < playerScore) playerHighScore = playerScore;
 }
 
 void Player::ResetStats()

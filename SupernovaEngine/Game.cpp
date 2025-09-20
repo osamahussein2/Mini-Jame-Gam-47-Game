@@ -1,7 +1,7 @@
 #include "Game.h"
 
 Game::Game() : player(&scene), spawnChickenTime(0.0f), randomMaxTime(0.0f), playerScoreText(&UI_scene), gamePaused(false),
-pauseMenu(&UI_scene), pauseKeyPressed(false), playerLivesText(&UI_scene)
+pauseMenu(&UI_scene), pauseKeyPressed(false), playerLivesText(&UI_scene), gameOver(&UI_scene), isGameOver(false)
 {
     randomMaxTime = 1.0f + (rand() % 2);
     playerScoreText.setVisible(false);
@@ -33,6 +33,7 @@ void Game::InitializeGame()
     playerLivesText.setVisible(true);
 
     pauseMenu.InitializePauseMenu();
+    gameOver.InitializeGameOver(player);
 
     // Initialize engine members
     Supernova::Engine::setScalingMode(Supernova::Scaling::STRETCH);
@@ -47,34 +48,48 @@ void Game::UpdateGame()
     // When the game is NOT paused
     if (!gamePaused)
     {
-        // Update player
-        player.UpdateGameObject();
-
-        // Update player's score
-        if (playerScoreText.getText() != "Score: " + std::to_string(player.GetPlayerScore()))
+        if (player.GetPlayerLives() > 0)
         {
-            playerScoreText.setText("Score: " + std::to_string(player.GetPlayerScore()));
+            // Update player
+            player.UpdateGameObject();
+
+            // Update player's score
+            if (playerScoreText.getText() != "Score: " + std::to_string(player.GetPlayerScore()))
+            {
+                playerScoreText.setText("Score: " + std::to_string(player.GetPlayerScore()));
+            }
+
+            // Update player's life value
+            if (playerLivesText.getText() != "Lives: " + std::to_string(player.GetPlayerLives()))
+            {
+                playerLivesText.setText("Lives: " + std::to_string(player.GetPlayerLives()));
+            }
+
+            // Update chickens vector
+            SpawnChickens();
+            UpdateChickens();
+
+            // Update eggs vector
+            IterateThroughEggs();
+
+            // Check for game related input
+            HandleGameInput();
         }
 
-        // Update player's life value
-        if (playerLivesText.getText() != "Lives: " + std::to_string(player.GetPlayerLives()))
+        // Player has no lives left
+        else
         {
-            playerLivesText.setText("Lives: " + std::to_string(player.GetPlayerLives()));
+            // Trigger game over
+            ExecuteGameOverScreen();
         }
-
-        // Update chickens vector
-        SpawnChickens();
-        UpdateChickens();
-
-        // Update eggs vector
-        IterateThroughEggs();
-
-        if (player.GetPlayerLives() <= 0) ResetGame();
     }
 
     // Otherwise, when the game IS paused
     else
     {
+        // Check for game related input
+        HandleGameInput();
+
         // Update pause menu
         pauseMenu.UpdatePauseMenu();
     }
@@ -85,9 +100,6 @@ void Game::UpdateGame()
         pauseMenu.ResetSelectedOption();
         gamePaused = false;
     }
-
-    // Check for game related input
-    HandleGameInput();
 }
 
 void Game::CleanGame() // Executes after the program quits running
@@ -264,20 +276,57 @@ void Game::ResetGame()
     player.ResetStats();
 
     spawnChickenTime = 0.0f;
+}
 
-    // Release all memory that the egg elements have used up
-    for (Egg* egg : eggs)
+void Game::ExecuteGameOverScreen()
+{
+    // If game over isn't set to true, update the player's highscore (if necessary) and show the game over screen
+    if (!isGameOver)
     {
-        delete egg;
+        // Hide the pause menu if it isn't hidden already
+        if (pauseMenu.GetVisibilty()) pauseMenu.ResumeGame();
+
+        // Update player's life value
+        playerLivesText.setText("Lives: " + std::to_string(player.GetPlayerLives()));
+
+        // Set player's score if needed
+        if (playerScoreText.getText() != "Score: " + std::to_string(player.GetPlayerScore()))
+        {
+            playerScoreText.setText("Score: " + std::to_string(player.GetPlayerScore()));
+        }
+
+        // Release all memory that the egg elements have used up
+        for (Egg* egg : eggs)
+        {
+            delete egg;
+        }
+
+        // Release all memory that the chicken elements have used up
+        for (Chicken* chicken : chickens)
+        {
+            delete chicken;
+        }
+
+        // Clear all elements of the vector
+        if (!eggs.empty()) eggs.clear();
+        if (!chickens.empty()) chickens.clear();
+
+        player.UpdateHighscore();
+        gameOver.ShowGameOver();
+
+        isGameOver = true; // Set game over to true once game over screen is visible
     }
 
-    // Release all memory that the chicken elements have used up
-    for (Chicken* chicken : chickens)
+    // If game over is true, update game over
+    else if (isGameOver)
     {
-        delete chicken;
-    }
+        gameOver.UpdateGameOver(player);
 
-    // Clear all elements of the vector
-    if (!eggs.empty()) eggs.clear();
-    if (!chickens.empty()) chickens.clear();
+        // Also we want to reset the game and set game over back to false once game over is no longer visible
+        if (!gameOver.GetVisibilty())
+        {
+            ResetGame();
+            isGameOver = false;
+        }
+    }
 }

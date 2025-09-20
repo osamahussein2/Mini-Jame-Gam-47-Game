@@ -5,6 +5,7 @@
 #include "Egg.h"
 #include "Chicken.h"
 #include "PauseMenu.h"
+#include "GameOver.h"
 
 class Game
 {
@@ -27,6 +28,8 @@ private:
 
 	void ResetGame();
 
+	void ExecuteGameOverScreen();
+
 private:
 	Supernova::Scene scene;
 	Supernova::Scene UI_scene;
@@ -39,12 +42,15 @@ private:
 	std::vector<Egg*> eggs;
 	
 	PauseMenu pauseMenu;
+	GameOver gameOver;
 
 	float spawnChickenTime;
 	float randomMaxTime;
 
 	bool gamePaused;
 	bool pauseKeyPressed;
+
+	bool isGameOver;
 };
 
 #endif GAME_H
