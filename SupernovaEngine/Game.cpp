@@ -2,10 +2,9 @@
 
 Game::Game() : player(&scene), spawnChickenTime(0.0f), randomMaxTime(0.0f), playerScoreText(&UI_scene), gamePaused(false),
 pauseMenu(&UI_scene), pauseKeyPressed(false), playerLivesText(&UI_scene), gameOver(&UI_scene), isGameOver(false), 
-gameMusic(&scene), musicPlaying(false), eggCollectSounds{ &scene, &scene }
+gameMusic(&scene), musicPlaying(false), eggCollectSounds{ &scene, &scene }, worldBackground(&scene), loadingImage(&UI_scene)
 {
     randomMaxTime = 1.0f + (rand() % 2);
-    playerScoreText.setVisible(false);
 }
 
 Game::~Game()
@@ -14,6 +13,18 @@ Game::~Game()
 
 void Game::InitializeGame()
 {
+    // Initialize world background
+    worldBackground.setTexture("WorldBackground.png");
+    worldBackground.setPosition(0.0f, 0.0f);
+    worldBackground.setSize(1000.0f, 600.0f);
+    worldBackground.setVisible(false);
+
+    // Initialize loading image
+    loadingImage.setTexture("LoadingImage.png");
+    loadingImage.setPosition(3.0f, 3.0f);
+    loadingImage.setSize(4, 3);
+    loadingImage.setVisible(true);
+
     // Initialize player
     player.InitializeGameObject();
 
@@ -21,7 +32,7 @@ void Game::InitializeGame()
     playerScoreText.setPositionXOffset(20.0f);
     playerScoreText.setPositionYOffset(20.0f);
     playerScoreText.setText("Score: " + std::to_string(player.GetPlayerScore()));
-    playerScoreText.setColor(1.0f, 1.0f, 1.0f);
+    playerScoreText.setColor(0.0f, 0.0f, 0.0f);
     playerScoreText.setFontSize(25.0f);
     playerScoreText.setVisible(true);
 
@@ -29,7 +40,7 @@ void Game::InitializeGame()
     playerLivesText.setPositionXOffset(20.0f);
     playerLivesText.setPositionYOffset(50.0f);
     playerLivesText.setText("Lives: " + std::to_string(player.GetPlayerLives()));
-    playerLivesText.setColor(1.0f, 1.0f, 1.0f);
+    playerLivesText.setColor(0.0f, 0.0f, 0.0f);
     playerLivesText.setFontSize(25.0f);
     playerLivesText.setVisible(true);
 
@@ -61,6 +72,12 @@ void Game::InitializeGame()
 
 void Game::UpdateGame()
 {
+    // Make loading image invisible once loading is done
+    if (loadingImage.isVisible()) loadingImage.setVisible(false);
+
+    // Make world background show up
+    if (!worldBackground.isVisible()) worldBackground.setVisible(true);
+
     // When the game is NOT paused
     if (!gamePaused)
     {

@@ -15,8 +15,8 @@ void PauseMenu::InitializePauseMenu()
 {
     pausePanel.setAnchorPreset(Supernova::AnchorPreset::CENTER_TOP);
     pausePanel.setSize(430, 600);
-    pausePanel.setColor(1.0f, 1.0f, 1.0f);
-    pausePanel.setAlpha(0.3f);
+    pausePanel.setColor(0.0f, 0.0f, 0.0f);
+    pausePanel.setAlpha(0.5f);
     pausePanel.setCanResize(false);
     pausePanel.addChild(&pauseTitle);
     pausePanel.addChild(&resumeText);

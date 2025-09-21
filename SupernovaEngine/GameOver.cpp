@@ -16,8 +16,8 @@ void GameOver::InitializeGameOver(Player& player_)
 {
     gameOverPanel.setAnchorPreset(Supernova::AnchorPreset::CENTER_TOP);
     gameOverPanel.setSize(430, 600);
-    gameOverPanel.setColor(1.0f, 1.0f, 1.0f);
-    gameOverPanel.setAlpha(0.3f);
+    gameOverPanel.setColor(0.0f, 0.0f, 0.0f);
+    gameOverPanel.setAlpha(0.5f);
     gameOverPanel.setCanResize(false);
     gameOverPanel.addChild(&gameOverTitle);
     gameOverPanel.addChild(&highscoreText);
