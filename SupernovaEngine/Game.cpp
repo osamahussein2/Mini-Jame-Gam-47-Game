@@ -2,7 +2,7 @@
 
 Game::Game() : player(&scene), spawnChickenTime(0.0f), randomMaxTime(0.0f), playerScoreText(&UI_scene), gamePaused(false),
 pauseMenu(&UI_scene), pauseKeyPressed(false), playerLivesText(&UI_scene), gameOver(&UI_scene), isGameOver(false), 
-gameMusic(&scene), musicPlaying(false), eggCollectSounds{ &scene, &scene }, worldBackground(&scene), loadingImage(&UI_scene)
+gameMusic(&scene), eggCollectSounds{ &scene, &scene }, worldBackground(&scene), loadingImage(&UI_scene)
 {
     randomMaxTime = 1.0f + (rand() % 2);
 }
@@ -48,9 +48,10 @@ void Game::InitializeGame()
     gameOver.InitializeGameOver(player);
 
     // Initialize game music
-    gameMusic.loadAudio("EggBasketGame DRAFT.mp3");
+    gameMusic.loadAudio("EggBasketGame OZONE MASTER.wav");
     gameMusic.setSound3D(false);
     gameMusic.setLopping(true);
+    gameMusic.play();
 
     // Initialize egg collect sounds
     eggCollectSounds[0].loadAudio("CollectEgg.mp3");
@@ -83,13 +84,6 @@ void Game::UpdateGame()
     {
         if (player.GetPlayerLives() > 0)
         {
-            // Play game music
-            if (!musicPlaying)
-            {
-                gameMusic.play();
-                musicPlaying = true;
-            }
-
             // Update player
             player.UpdateGameObject();
 
@@ -147,9 +141,6 @@ void Game::CleanGame() // Executes after the program quits running
     // Destroy scenes
     scene.destroy();
     UI_scene.destroy();
-
-    // Music will be destroyed anyways
-    musicPlaying = false;
 
     gameMusic.destroyAudio();
 
@@ -380,6 +371,8 @@ void Game::ExecuteGameOverScreen()
         // Also we want to reset the game and set game over back to false once game over is no longer visible
         if (!gameOver.GetVisibilty())
         {
+            gameMusic.play();
+
             ResetGame();
             isGameOver = false;
         }
@@ -389,9 +382,5 @@ void Game::ExecuteGameOverScreen()
 void Game::StopGameMusic()
 {
     // Stop playing music
-    if (musicPlaying)
-    {
-        gameMusic.stop();
-        musicPlaying = false;
-    }
+    gameMusic.stop();
 }

@@ -60,8 +60,6 @@ private:
 	bool pauseKeyPressed;
 
 	bool isGameOver;
-
-	bool musicPlaying;
 };
 
 #endif GAME_H
