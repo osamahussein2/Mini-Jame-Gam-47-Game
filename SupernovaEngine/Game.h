@@ -38,6 +38,8 @@ private:
 
 	Supernova::Text playerScoreText, playerLivesText;
 
+	std::array<Supernova::Audio, 2> eggCollectSounds; // 0 for real egg, 1 for fake egg
+
 	Player player;
 
 	std::vector<Chicken*> chickens;

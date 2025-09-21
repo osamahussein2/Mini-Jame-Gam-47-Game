@@ -2,7 +2,7 @@
 
 Game::Game() : player(&scene), spawnChickenTime(0.0f), randomMaxTime(0.0f), playerScoreText(&UI_scene), gamePaused(false),
 pauseMenu(&UI_scene), pauseKeyPressed(false), playerLivesText(&UI_scene), gameOver(&UI_scene), isGameOver(false), 
-gameMusic(&scene), musicPlaying(false)
+gameMusic(&scene), musicPlaying(false), eggCollectSounds{ &scene, &scene }
 {
     randomMaxTime = 1.0f + (rand() % 2);
     playerScoreText.setVisible(false);
@@ -40,6 +40,16 @@ void Game::InitializeGame()
     gameMusic.loadAudio("EggBasketGame DRAFT.mp3");
     gameMusic.setSound3D(false);
     gameMusic.setLopping(true);
+
+    // Initialize egg collect sounds
+    eggCollectSounds[0].loadAudio("CollectEgg.mp3");
+    eggCollectSounds[1].loadAudio("FakeEgg.mp3");
+
+    for (Supernova::Audio& eggCollectSound : eggCollectSounds)
+    {
+        eggCollectSound.setSound3D(false);
+        eggCollectSound.setLopping(false);
+    }
 
     // Initialize engine members
     Supernova::Engine::setScalingMode(Supernova::Scaling::STRETCH);
@@ -125,6 +135,10 @@ void Game::CleanGame() // Executes after the program quits running
     musicPlaying = false;
 
     gameMusic.destroyAudio();
+
+    // Destroy the egg collect sounds audio
+    eggCollectSounds[0].destroyAudio();
+    eggCollectSounds[1].destroyAudio();
 
     // Clean the player (if needed)
     player.CleanPlayer();
@@ -225,6 +239,8 @@ void Game::IterateThroughEggs()
             if (egg->GetPosition().y + (egg->GetSize().y / 1.2f) <= player.GetPosition().y && 
                 egg->GetEggType() == EggType::FreshEgg)
             {
+                eggCollectSounds[0].play(); // Play collected fresh egg sound
+
                 player.IncrementScore(10);
             }
 
@@ -232,6 +248,8 @@ void Game::IterateThroughEggs()
             else if (egg->GetPosition().y + (egg->GetSize().y / 1.2f) <= player.GetPosition().y &&
                 egg->GetEggType() == EggType::FakeEgg)
             {
+                eggCollectSounds[1].play(); // Play collected fake egg sound
+
                 player.DecrementLife(1);
             }
 
