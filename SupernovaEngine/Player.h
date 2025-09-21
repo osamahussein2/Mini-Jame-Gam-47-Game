@@ -33,7 +33,7 @@ private:
 	void DetectPlayerInput();
 
 private:
-	static constexpr float playerMoveSpeed = 700.0f;
+	static constexpr float playerMoveSpeed = 800.0f;
 
 	Supernova::Image playerImage;
 

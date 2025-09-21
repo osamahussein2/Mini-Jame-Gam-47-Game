@@ -3,8 +3,8 @@
 Player::Player(Supernova::Scene* scene_) : GameObject(), playerImage(scene_), playerScore(0), playerLives(5), 
 playerHighScore(0)
 {
-	position = Supernova::Vector2(300.0f, 550.0f);
-	size = Supernova::Vector2(100.0f, 100.0f);
+	position = Supernova::Vector2(300.0f, 545.0f);
+	size = Supernova::Vector2(100.0f, 50.0f);
 
 	playerImage.setVisible(false);
 }
@@ -15,7 +15,7 @@ Player::~Player()
 
 void Player::InitializeGameObject()
 {
-	playerImage.setTexture("");
+	playerImage.setTexture("Basket.png");
 	playerImage.setSize(size.x, size.y);
 	playerImage.setPosition(position.x, position.y);
 	playerImage.setVisible(true);
