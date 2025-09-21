@@ -20,6 +20,7 @@ public:
 	int GetRandomDirection() const { return randomizeDirection; }
 
 	Supernova::Vector2 GetPosition() const { return position; }
+	Supernova::Vector2 GetSize() const { return size; }
 
 	int GetRandomizedPercentage() const { return randomizedPercentage; }
 

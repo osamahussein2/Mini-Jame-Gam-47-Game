@@ -170,9 +170,9 @@ void Game::UpdateChickens()
             // If the percentage is between 0-60
             if (chicken->GetRandomizedPercentage() <= 60)
             {
-                // Spawn a fresh egg
-                eggs.push_back(new Egg(&scene, Supernova::Vector2(chicken->GetPosition().x, chicken->GetPosition().y), 
-                    EggType::FreshEgg));
+                // Spawn a fresh egg at the center point of the chicken
+                eggs.push_back(new Egg(&scene, Supernova::Vector2(chicken->GetPosition().x + (chicken->GetSize().x / 2.0f), 
+                    chicken->GetPosition().y + (chicken->GetSize().y / 2.0f)), EggType::FreshEgg));
 
                 // This just sets spawned egg for the chicken to true and re-enables their movement
                 chicken->SpawnedEgg();
@@ -181,9 +181,9 @@ void Game::UpdateChickens()
             // Otherwise, the percentage is greater than 60 (this half is meant for 40% chance)
             else
             {
-                // Spawn a fake egg
-                eggs.push_back(new Egg(&scene, Supernova::Vector2(chicken->GetPosition().x, chicken->GetPosition().y),
-                    EggType::FakeEgg));
+                // Spawn a fake egg at the center point of the chicken
+                eggs.push_back(new Egg(&scene, Supernova::Vector2(chicken->GetPosition().x + (chicken->GetSize().x / 2.0f),
+                    chicken->GetPosition().y + (chicken->GetSize().y / 2.0f)), EggType::FakeEgg));
 
                 // This just sets spawned egg for the chicken to true and re-enables their movement
                 chicken->SpawnedEgg();
@@ -236,7 +236,7 @@ void Game::IterateThroughEggs()
         else if (egg->CheckEggCollision(player.GetPosition(), player.GetSize()))
         {
             // Only increment the score if the fresh egg is on top of the basket upon collision
-            if (egg->GetPosition().y + (egg->GetSize().y / 1.2f) <= player.GetPosition().y && 
+            if (egg->GetPosition().y + (egg->GetSize().y / 1.3f) <= player.GetPosition().y && 
                 egg->GetEggType() == EggType::FreshEgg)
             {
                 eggCollectSounds[0].play(); // Play collected fresh egg sound
@@ -245,7 +245,7 @@ void Game::IterateThroughEggs()
             }
 
             // Only decrement player's life if the fake egg is on top of the basket upon collision
-            else if (egg->GetPosition().y + (egg->GetSize().y / 1.2f) <= player.GetPosition().y &&
+            else if (egg->GetPosition().y + (egg->GetSize().y / 1.3f) <= player.GetPosition().y &&
                 egg->GetEggType() == EggType::FakeEgg)
             {
                 eggCollectSounds[1].play(); // Play collected fake egg sound

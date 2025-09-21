@@ -10,10 +10,12 @@ knowsStopPoint(false), stoppedMoving(false), randomizeDirection(0), randomizedPe
 	{
 	case 0: // Going right
 		position = Supernova::Vector2(-50.0f, posY_);
+		chickenImage.setTexture("ChickenNormal.png");
 		break;
 
 	case 1: // Going left
 		position = Supernova::Vector2(1050.0f, posY_);
+		chickenImage.setTexture("ChickenFlipped.png");
 		break;
 
 	default:
@@ -23,8 +25,6 @@ knowsStopPoint(false), stoppedMoving(false), randomizeDirection(0), randomizedPe
 	size = Supernova::Vector2(100.0f, 100.0f);
 
 	// Set chicken image settings
-	chickenImage.setTexture("");
-	chickenImage.setColor(1.0f, 0.0f, 0.0f);
 	chickenImage.setSize(size.x, size.y);
 	chickenImage.setPosition(position.x, position.y);
 	chickenImage.setVisible(true);
